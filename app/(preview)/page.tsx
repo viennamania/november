@@ -8,7 +8,11 @@ import {
   VercelIcon,
 } from "@/components/icons";
 import { useChat } from "ai/react";
+
+//import { DragEvent, useEffect, useRef, useState } from "react";
+
 import { DragEvent, useEffect, useRef, useState } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -19,16 +23,18 @@ const getTextFromDataUrl = (dataUrl: string) => {
   return window.atob(base64);
 };
 
-function TextFilePreview({ file }: { file: File }) {
+function TextFilePreview({ file }: { file: File | undefined }) {
   const [content, setContent] = useState<string>("");
 
   useEffect(() => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result;
-      setContent(typeof text === "string" ? text.slice(0, 100) : "");
-    };
-    reader.readAsText(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result;
+        setContent(typeof text === "string" ? text.slice(0, 100) : "");
+      };
+      reader.readAsText(file as Blob);
+    }
   }, [file]);
 
   return (
@@ -62,7 +68,7 @@ export default function Home() {
       if (files.length > 0) {
         const validFiles = files.filter(
           (file) =>
-            file.type.startsWith("image/") || file.type.startsWith("text/")
+            (file as File).type.startsWith("image/") || (file as File).type.startsWith("text/")
         );
 
         if (validFiles.length === files.length) {
@@ -92,13 +98,18 @@ export default function Home() {
     const droppedFilesArray = Array.from(droppedFiles);
     if (droppedFilesArray.length > 0) {
       const validFiles = droppedFilesArray.filter(
-        (file) =>
-          file.type.startsWith("image/") || file.type.startsWith("text/")
+
+        (
+          file
+        ) =>
+          (file as File).type.startsWith("image/") || (file as File).type.startsWith("text/")
       );
 
       if (validFiles.length === droppedFilesArray.length) {
         const dataTransfer = new DataTransfer();
-        validFiles.forEach((file) => dataTransfer.items.add(file));
+        validFiles.forEach((file) => dataTransfer.items.add(
+          file as File
+        ));
         setFiles(dataTransfer.files);
       } else {
         toast.error("Only image and text files are allowed!");
@@ -244,11 +255,15 @@ export default function Home() {
             {files && files.length > 0 && (
               <div className="flex flex-row gap-2 absolute bottom-12 px-4 w-full md:w-[500px] md:px-0">
                 {Array.from(files).map((file) =>
-                  file.type.startsWith("image") ? (
-                    <div key={file.name}>
+                  (file as File).type.startsWith("image") ? (
+                    <div key={(file as File).name}>
                       <motion.img
-                        src={URL.createObjectURL(file)}
-                        alt={file.name}
+                        src={URL.createObjectURL(
+                          file as File
+                        )}
+                        alt={
+                          (file as File).name
+                        }
                         className="rounded-md w-16"
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -260,9 +275,11 @@ export default function Home() {
                         }}
                       />
                     </div>
-                  ) : file.type.startsWith("text") ? (
+                  ) : (file as File).type.startsWith("text") ? (
                     <motion.div
-                      key={file.name}
+                      key={
+                        (file as File).name
+                      }
                       className="text-[8px] leading-1 w-28 h-16 overflow-hidden text-zinc-500 border p-2 rounded-lg bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-400"
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
@@ -273,7 +290,7 @@ export default function Home() {
                         transition: { duration: 0.2 },
                       }}
                     >
-                      <TextFilePreview file={file} />
+                      <TextFilePreview file={file as File} />
                     </motion.div>
                   ) : null
                 )}
