@@ -39,6 +39,7 @@ function TextFilePreview({ file }: { file: File }) {
   );
 }
 
+
 export default function Home() {
   const { messages, input, handleSubmit, handleInputChange, isLoading } =
     useChat({
