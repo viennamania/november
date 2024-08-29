@@ -118,6 +118,8 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
+
+
   return (
     <div
       className="flex flex-row justify-center pb-20 h-dvh bg-white dark:bg-zinc-900"
@@ -203,6 +205,7 @@ export default function Home() {
                 <span>+</span>
                 <AttachmentIcon />
               </p>
+              {/*
               <p>
                 The useChat hook supports sending attachments along with
                 messages as well as rendering previews on the client. This can
@@ -221,6 +224,9 @@ export default function Home() {
                 </Link>
                 hook from Vercel AI SDK.
               </p>
+              */}
+
+
             </div>
           </motion.div>
         )}
